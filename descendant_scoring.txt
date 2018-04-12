@@ -1,0 +1,18 @@
+Ancestor score boosting.
+
+When the ups or downs of a post changes, go to its ancestor. If score("Greatest Descendant") < score("me") -time("me), change their greatest descendant to you. if you do, go to their ancestor and do the same thing.
+
+Also when your ups or downs changes, see if your score is better than your current greatest descendant. If yes, change your greatest descendant to yourself.
+
+When calculating a post's total score, run the function on your ups and downs, and then look at the ups and downs of each of your descendants greatest descendant (do not look at yours). Add all but the first greatest descendant (minus their time of cretion) to your own score. This is your total score.
+
+Vulnerabilities:
+
+I create a story. I then create a hundred children. I vote for each child once, adding 99 to the score of my story.
+
+Maybe we can route around this. I could limit the number of votes per minute.
+
+Things I don't want:
+
+If I have two popular Lines of descendants, I might keep appearing on the front page long after I am relavent.
+Huge problem: we add the current time twice.

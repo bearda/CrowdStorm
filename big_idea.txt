@@ -1,0 +1,11 @@
+The big idea is reddit plus git.
+
+ANYONE can make a commit. the community then votes on whether the idea got
+better or worse. The more popular leaves and branches are displayed higher up.
+The most popular projects are recomended on the front page, and their genre 
+page.
+
+If many descendants of a common ancester get popular at the same time, the 
+popularity of the most recent common ancestor goes up.
+
+There should also be a discussion page. I want one for each commit, and one for the project as a whole. The one for the project as a whole could let people discuss the direction they wanted things to go in, branches, whatnot. The commit pages allow for easy feedback.

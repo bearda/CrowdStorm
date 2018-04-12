@@ -1,0 +1,20 @@
+So what needs to be done?
+-Comprehensive list of features
+	-user stories
+	-fundamental algorithms decided here. How do we boost ancestors?
+-work out how someone could profit
+-website structure sketched on paper
+	-where do the ads go?
+	-how should stories be organized?
+	-How should users sign up?
+-webpages sketched out on paper
+-database structure on paper
+	-backup strategy?
+	-remember to store passwords securely
+-back end structure on paper
+	-should go on aws at start
+	-what do we store in RAM, on the hardisk?
+	-how does a request go from the user to our database?
+	-how does data go from our database to the user?
+
+All this before writing a single line of html or java or javascript.
