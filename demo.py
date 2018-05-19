@@ -49,18 +49,34 @@ class Post(object):
         return str(self.ID) + "," + str(self.user) + "," + str(self.ups) + "," + str(self.downs) + "," + str(self.getParentID())
 
 class votingPopUp(Toplevel):
-    def __init__(self, master, tree, node):
+    def __init__(self, master, treeclear, node):
         Toplevel.__init__(self, master)
+        self.node = node
+        self.treeclear = treeclear
         self.label = Label(self, text=node.ID)
         self.label.grid()
-        self.upVote = Button(self, command=self.voteUp)
+        self.upVote = Button(self, command=self.voteUp, text="Up")
         self.upVote.grid(row=1, column=0)
-        self.downVote = Button(self, command=self.voteDown)
+        self.downVote = Button(self, command=self.voteDown, text="Down")
         self.downVote.grid(row=1, column=1)
     def voteUp(self):
-        pass
+        self.node.ups += 1
+        self.treeclear()
     def voteDown(self):
-        pass
+        self.node.downs += 1
+        self.treeclear()
+
+class PostElement(Frame):
+    def __init__(self, master, post):
+        Frame.__init__(self)
+        self.post = post
+        self.postIdLabel = Label(master, text=self.post.ID)
+        self.userLabel = Label(master, text=self.user)
+
+    def self._grid(self):
+        self.postIdLabel.grid()
+        self.userLabel.grid()
+        self.grid()
 
 class board():
     def __init__(self, postList):
@@ -82,7 +98,18 @@ class board():
         for candidate in self.posts:
             if candidate.ID == item:
                 post = candidate
-        votingPopUp(self.tkRoot, self.tree, post)
+        votingPopUp(self.tkRoot, self.refresh, post)
+
+    def refresh(self):
+        #get open/closed state for each item
+        for post in self.tree.get_children():
+            print (post)
+        self.tree.pack_forget()
+        self.tree = Treeview(self.tkRoot)
+        self.tree["columns"] = ["User", "Score"]
+        for post in self.posts:
+            self.tree.insert(post.getParentID(), "end", iid=post.ID, text=post.ID, values=(post.user, post.calcScore()))
+        self.tree.pack()
 
 
 #make default menu
