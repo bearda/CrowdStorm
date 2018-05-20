@@ -48,6 +48,7 @@ class Post(object):
         #ID,user,ups,downs,parentName
         return str(self.ID) + "," + str(self.user) + "," + str(self.ups) + "," + str(self.downs) + "," + str(self.getParentID())
 
+
 class votingPopUp(Toplevel):
     def __init__(self, master, treeclear, node):
         Toplevel.__init__(self, master)
@@ -66,32 +67,66 @@ class votingPopUp(Toplevel):
         self.node.downs += 1
         self.treeclear()
 
-class PostElement(Frame):
-    def __init__(self, master, post):
-        Frame.__init__(self)
+class PostElement():
+    def __init__(self, master, post, refresh):
         self.post = post
-        self.postIdLabel = Label(master, text=self.post.ID)
-        self.userLabel = Label(master, text=self.user)
+        self.master = master
+        self.refresh = refresh
+        #I have no idea why we need this frame. it won't indent if I don't
+        self.mainFrame = Frame(self.master, borderwidth=2, relief=RIDGE)
+        self.makeInfoFrame(self.mainFrame)
+        self.makeContentFrame(self.mainFrame)
+        self.makeButtonFrame(self.mainFrame)
 
-    def self._grid(self):
-        self.postIdLabel.grid()
-        self.userLabel.grid()
-        self.grid()
+    def makeInfoFrame(self, master):
+        self.infoFrame = Frame(master, borderwidth=2, relief=RIDGE)
+        self.userLabel = Label(self.infoFrame, text=self.post.user)
+        self.userLabel.grid(row=0, column=0)
+        self.idLabel = Label(self.infoFrame, text=self.post.ID, justify=RIGHT)
+        self.idLabel.grid(row=0, column=1, sticky=E+W)
+    def makeContentFrame(self, master):
+        self.contentFrame = Frame(master)
+        tmpLabel = Label(self.contentFrame, text="Lorem ipsum id on't actually know the words'")
+        tmpLabel.grid()
+    def makeButtonFrame(self, master):
+        self.buttonFrame = Frame(master)
+        likeButton = Button(self.buttonFrame, text="Like")
+        dislikeButton = Button(self.buttonFrame, text="Dislike")
+        replyButton = Button(self.buttonFrame, text="Reply", command=self.addReply)
+        likeButton.grid(row=1, column=0)
+        dislikeButton.grid(row=1, column=1)
+        replyButton.grid(row=1, column=2)
+
+    def addReply(self):
+        replyPost = Post("5","Alice",  7, 2, self.post)
+        self.refresh()
+    
+    def _grid(self):
+        self.infoFrame.grid(sticky=W+E)
+        self.contentFrame.grid()
+        self.buttonFrame.grid()
+        self.mainFrame.grid(sticky=W+E)
+
+def gridPostAndChildren(master, post, refresh, indent=0):
+    pFrame = Frame(master, borderwidth=5, relief=RIDGE)
+    pElement = PostElement(pFrame, post, refresh)
+    pElement._grid()
+    pFrame.grid(sticky=W+E, padx=(40*indent,15))
+    for child in post.children:
+        gridPostAndChildren(master, child, refresh, indent + 1)
+
 
 class board():
     def __init__(self, postList):
         #make the window
         self.tkRoot = Tk()
         self.posts = postList
-        self.tree = Treeview(self.tkRoot)
-        self.tree["columns"] = ["User", "Score"]
-        for post in self.posts:
-            self.tree.insert(post.getParentID(), "end", iid=post.ID, text=post.ID, values=(post.user, post.calcScore()))
-        self.tree.pack()
-        print ("Off to the races!")
-	self.tree.bind("<Double-1>", self.OnDoubleClick)
+        self.makeMainArea()
         self.tkRoot.mainloop()
 
+    def makeMainArea(self):
+        gridPostAndChildren(self.tkRoot, self.posts[0], self.refresh)
+    
     def OnDoubleClick(self, event):
         item = self.tree.selection()[0]
         post = None
@@ -101,15 +136,10 @@ class board():
         votingPopUp(self.tkRoot, self.refresh, post)
 
     def refresh(self):
-        #get open/closed state for each item
-        for post in self.tree.get_children():
-            print (post)
-        self.tree.pack_forget()
-        self.tree = Treeview(self.tkRoot)
-        self.tree["columns"] = ["User", "Score"]
-        for post in self.posts:
-            self.tree.insert(post.getParentID(), "end", iid=post.ID, text=post.ID, values=(post.user, post.calcScore()))
-        self.tree.pack()
+        for child in self.tkRoot.winfo_children():
+            child.destroy()
+        print("destroyed stuff, now I make stuff")
+        self.makeMainArea()
 
 
 #make default menu
@@ -166,6 +196,7 @@ def doBoard():
     newPost = Post("1","Bob", 7, 2, None)
     replyPost = Post("2","Alice",  7, 2, newPost)
     SisterPost = Post("3","Carrol", 8, 2, newPost)
+    SisterPost = Post("4","Carrol", 8, 2, replyPost)
     newBoard = board([newPost,replyPost,SisterPost])
 
 
