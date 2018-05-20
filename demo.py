@@ -4,9 +4,10 @@ from ttk import *
 
 
 class Post(object):
-    def __init__(self, ID, user, ups, downs, parent):
+    def __init__(self, ID, user, text, ups, downs, parent):
         self.ID = ID
         self.user = user
+        self.text = text
         self.ups = ups
         self.downs = downs
         self.parent = parent
@@ -66,7 +67,6 @@ class votingPopUp(Toplevel):
     def voteDown(self):
         self.node.downs += 1
         self.treeclear()
-
 class PostElement():
     def __init__(self, master, post, refresh):
         self.post = post
@@ -86,7 +86,7 @@ class PostElement():
         self.idLabel.grid(row=0, column=1, sticky=E+W)
     def makeContentFrame(self, master):
         self.contentFrame = Frame(master)
-        tmpLabel = Label(self.contentFrame, text="Lorem ipsum id on't actually know the words'")
+        tmpLabel = Label(self.contentFrame, text=self.post.text)
         tmpLabel.grid()
     def makeButtonFrame(self, master):
         self.buttonFrame = Frame(master)
@@ -98,18 +98,43 @@ class PostElement():
         replyButton.grid(row=1, column=2)
 
     def addReply(self):
-        replyPost = Post("5","Alice",  7, 2, self.post)
+        replyPost = Post(-1,"Alice", '', 0, 0, self.post)
         self.refresh()
     
     def _grid(self):
         self.infoFrame.grid(sticky=W+E)
         self.contentFrame.grid()
         self.buttonFrame.grid()
-        self.mainFrame.grid(sticky=W+E)
+        self.mainFrame.grid()
+
+class NewPostElement(PostElement):
+    def __init__(self, master, post, refresh):
+        PostElement.__init__(self, master, post, refresh)
+    def makeContentFrame(self, master):
+        self.contentFrame = Frame(master)
+        self.textArea = Text(self.contentFrame, height=4)
+        self.textArea.grid()
+    def makeButtonFrame(self, master):
+        self.buttonFrame = Frame(master)
+        cancelButton = Button(self.buttonFrame, text="cancel", command=self.cancel)
+        postButton = Button(self.buttonFrame, command=self.makePost)
+        cancelButton.grid(row=0,column=0)
+        postButton.grid(row=0,column=1)
+    def cancel(self):
+        self.post.parent.children.remove(self.post)
+        self.refresh()
+    def makePost(self):
+        self.post.ID = 10
+        self.post.text = self.textArea.get("1.0", END)
+        self.refresh()
 
 def gridPostAndChildren(master, post, refresh, indent=0):
     pFrame = Frame(master, borderwidth=5, relief=RIDGE)
-    pElement = PostElement(pFrame, post, refresh)
+    if post.ID == -1:
+        #make temp element
+        pElement = NewPostElement(pFrame, post, refresh)
+    else:
+        pElement = PostElement(pFrame, post, refresh)
     pElement._grid()
     pFrame.grid(sticky=W+E, padx=(40*indent,15))
     for child in post.children:
@@ -193,10 +218,10 @@ def printTree(root, indentLevel):
         printTree(child, indentLevel + 1)
 
 def doBoard():
-    newPost = Post("1","Bob", 7, 2, None)
-    replyPost = Post("2","Alice",  7, 2, newPost)
-    SisterPost = Post("3","Carrol", 8, 2, newPost)
-    SisterPost = Post("4","Carrol", 8, 2, replyPost)
+    newPost = Post(1,"Bob", 7, 'what i said', 2, None)
+    replyPost = Post(2,"Alice", 'what she said', 7, 2, newPost)
+    SisterPost = Post(3,"Carrol",'a thing', 8, 2, newPost)
+    SisterPost = Post(4,"Carrol", 'another thing', 8, 2, replyPost)
     newBoard = board([newPost,replyPost,SisterPost])
 
 
