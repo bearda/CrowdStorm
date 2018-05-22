@@ -49,6 +49,13 @@ class Post(object):
         #ID,user,ups,downs,parentName
         return str(self.ID) + "," + str(self.user) + "," + str(self.ups) + "," + str(self.downs) + "," + str(self.getParentID())
 
+    def orderChildren(self):
+        self.bestDescendant = None
+        for child in self.children:
+            if (self.bestDescendant == None) or (child.calcScore() > self.bestDescendant.calcScore()):
+                self.bestDescendant = child
+
+
 
 class votingPopUp(Toplevel):
     def __init__(self, master, treeclear, node):
@@ -123,6 +130,7 @@ class NewPostElement(PostElement):
     def cancel(self):
         self.post.parent.children.remove(self.post)
         self.refresh()
+        del self
     def makePost(self):
         self.post.ID = 10
         self.post.text = self.textArea.get("1.0", END)
