@@ -1,6 +1,7 @@
 import sys
 from Tkinter import *
 from ttk import *
+import csv
 
 
 class Post(object):
@@ -45,9 +46,13 @@ class Post(object):
         if (self.bestDescendant == None) or (child.calcScore() > self.bestDescendant.calcScore()):
             self.bestDescendant = child
 
-    def toCsvString(self):
+    def saveCsvString(self):
         #ID,user,ups,downs,parentName
-        return str(self.ID) + "," + str(self.user) + "," + str(self.ups) + "," + str(self.downs) + "," + str(self.getParentID())
+        writer = csv.writer(open('test.csv', 'wb'))
+        writer.writerow([str(self.ID), str(self.user), self.text, str(self.ups), str(self.downs), str(self.getParentID())])
+
+    def saveCsvString(self, writer):
+        writer.writerow([str(self.ID), str(self.user), self.text, str(self.ups), str(self.downs), str(self.getParentID())])
 
     def orderChildren(self):
         self.bestDescendant = None
@@ -155,10 +160,28 @@ class board():
         self.tkRoot = Tk()
         self.posts = postList
         self.makeMainArea()
+        self.makeButtonArea()
         self.tkRoot.mainloop()
 
     def makeMainArea(self):
-        gridPostAndChildren(self.tkRoot, self.posts[0], self.refresh)
+        self.mainFrame = Frame(self.tkRoot)
+        gridPostAndChildren(self.mainFrame, self.posts[0], self.refresh)
+        self.mainFrame.grid()
+
+    def makeButtonArea(self):
+        self.buttonFrame = Frame(self.tkRoot)
+        self.saveButton = Button(self.buttonFrame, text="save", command=self.savePosts)
+        self.saveButton.grid()
+        self.buttonFrame.grid()
+
+    def savePosts(self):
+        writer = csv.writer(open('test.csv', 'wb'))
+        self.savePostsHelper(self.posts[0], writer)
+
+    def savePostsHelper(self, post, writer):
+        post.saveCsvString(writer)
+        for child in post.children:
+            self.savePostsHelper(child, writer)
     
     def OnDoubleClick(self, event):
         item = self.tree.selection()[0]
