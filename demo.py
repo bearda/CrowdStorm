@@ -129,7 +129,7 @@ class NewPostElement(PostElement):
     def makeButtonFrame(self, master):
         self.buttonFrame = Frame(master)
         cancelButton = Button(self.buttonFrame, text="cancel", command=self.cancel)
-        postButton = Button(self.buttonFrame, command=self.makePost)
+        postButton = Button(self.buttonFrame, text="post", command=self.makePost)
         cancelButton.grid(row=0,column=0)
         postButton.grid(row=0,column=1)
     def cancel(self):
@@ -159,12 +159,12 @@ class board():
         #make the window
         self.tkRoot = Tk()
         self.posts = postList
+        self.mainFrame = Frame(self.tkRoot)
         self.makeMainArea()
         self.makeButtonArea()
         self.tkRoot.mainloop()
 
     def makeMainArea(self):
-        self.mainFrame = Frame(self.tkRoot)
         gridPostAndChildren(self.mainFrame, self.posts[0], self.refresh)
         self.mainFrame.grid()
 
@@ -215,8 +215,6 @@ class board():
     def refresh(self):
         for child in self.mainFrame.winfo_children():
             child.destroy()
-
-        self.mainFrame.destroy()
         print("destroyed stuff, now I make stuff")
         self.makeMainArea()
 
