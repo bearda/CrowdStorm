@@ -172,11 +172,32 @@ class board():
         self.buttonFrame = Frame(self.tkRoot)
         self.saveButton = Button(self.buttonFrame, text="save", command=self.savePosts)
         self.saveButton.grid()
+        self.loadButton = Button(self.buttonFrame, text="load", command=self.loadPosts)
+        self.loadButton.grid()
         self.buttonFrame.grid()
 
     def savePosts(self):
         writer = csv.writer(open('test.csv', 'wb'))
         self.savePostsHelper(self.posts[0], writer)
+    def loadPosts(self):
+        self.posts = []
+        reader = csv.reader(open('test.csv', 'rb'))
+        for row in reader:
+            print(row)
+            self.loadPostHelper(row)
+        self.refresh()
+
+    def loadPostHelper(self, row):
+        parent = None
+        print("in helper")
+        for post in self.posts:
+            if post.ID == int(row[5]):
+                parent = post
+                break
+        print (parent)
+        newPost = Post(int(row[0]), row[1], row[2], int(row[3]), int(row[4]), parent)
+        self.posts.append(newPost)
+
 
     def savePostsHelper(self, post, writer):
         post.saveCsvString(writer)
@@ -192,8 +213,10 @@ class board():
         votingPopUp(self.tkRoot, self.refresh, post)
 
     def refresh(self):
-        for child in self.tkRoot.winfo_children():
+        for child in self.mainFrame.winfo_children():
             child.destroy()
+
+        self.mainFrame.destroy()
         print("destroyed stuff, now I make stuff")
         self.makeMainArea()
 
@@ -249,7 +272,7 @@ def printTree(root, indentLevel):
         printTree(child, indentLevel + 1)
 
 def doBoard():
-    newPost = Post(1,"Bob", 7, 'what i said', 2, None)
+    newPost = Post(1,"Bob", 'what i said', 2, 7, None)
     replyPost = Post(2,"Alice", 'what she said', 7, 2, newPost)
     SisterPost = Post(3,"Carrol",'a thing', 8, 2, newPost)
     SisterPost = Post(4,"Carrol", 'another thing', 8, 2, replyPost)
