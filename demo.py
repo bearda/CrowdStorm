@@ -155,18 +155,27 @@ def gridPostAndChildren(master, post, refresh, indent=0):
 
 
 class board():
-    def __init__(self, postList):
+    def __init__(self, rootPost):
         #make the window
         self.tkRoot = Tk()
-        self.posts = postList
+        self.rootPost = rootPost
+        self.posts = []
+        self.addPostToPosts(self.rootPost)
         self.mainFrame = Frame(self.tkRoot)
         self.makeMainArea()
+        self.makeSecondaryArea()
         self.makeButtonArea()
         self.tkRoot.mainloop()
 
     def makeMainArea(self):
         gridPostAndChildren(self.mainFrame, self.posts[0], self.refresh)
-        self.mainFrame.grid()
+        self.mainFrame.grid(row=0, column=0)
+    def makeSecondaryArea(self):
+        self.sideFrame = Frame(self.tkRoot)
+        for post in self.posts:
+            Label(self.sideFrame, text=post.text).grid()
+        self.sideFrame.grid(row=0, column=1)
+
 
     def makeButtonArea(self):
         self.buttonFrame = Frame(self.tkRoot)
@@ -176,6 +185,10 @@ class board():
         self.loadButton.grid()
         self.buttonFrame.grid()
 
+    def addPostToPosts(self, post):
+        self.posts.append(post)
+        for child in post.children:
+            self.addPostToPosts(child)
     def savePosts(self):
         writer = csv.writer(open('test.csv', 'wb'))
         self.savePostsHelper(self.posts[0], writer)
@@ -274,7 +287,7 @@ def doBoard():
     replyPost = Post(2,"Alice", 'what she said', 7, 2, newPost)
     SisterPost = Post(3,"Carrol",'a thing', 8, 2, newPost)
     SisterPost = Post(4,"Carrol", 'another thing', 8, 2, replyPost)
-    newBoard = board([newPost,replyPost,SisterPost])
+    newBoard = board(newPost)
 
 
 def getCommand():
