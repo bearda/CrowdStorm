@@ -163,13 +163,15 @@ class board():
         self.addPostToPosts(self.rootPost)
         self.mainFrame = Frame(self.tkRoot)
         self.makeMainArea()
+        self.mainFrame.grid()
         self.makeSecondaryArea()
         self.makeButtonArea()
         self.tkRoot.mainloop()
 
     def makeMainArea(self):
-        gridPostAndChildren(self.mainFrame, self.posts[0], self.refresh)
-        self.mainFrame.grid(row=0, column=0)
+        self.postArea = Frame(self.mainFrame)
+        gridPostAndChildren(self.postArea, self.posts[0], self.refresh)
+        self.postArea.grid(row=0, column=0)
     def makeSecondaryArea(self):
         self.sideFrame = Frame(self.tkRoot)
         for post in self.posts:
@@ -229,7 +231,10 @@ class board():
         for child in self.mainFrame.winfo_children():
             child.destroy()
         print("destroyed stuff, now I make stuff")
+        for child in self.sideFrame.winfo_children():
+            child.destroy()
         self.makeMainArea()
+        self.makeSecondaryArea()
 
 
 #make default menu
