@@ -161,6 +161,7 @@ class board():
         self.rootPost = rootPost
         self.posts = []
         self.addPostToPosts(self.rootPost)
+        self.sortPosts()
         self.mainFrame = Frame(self.tkRoot)
         self.makeMainArea()
         self.mainFrame.grid()
@@ -174,7 +175,7 @@ class board():
         self.postArea.grid(row=0, column=0)
     def makeSecondaryArea(self):
         self.sideFrame = Frame(self.tkRoot)
-        for post in self.posts:
+        for post in self.posts[::-1]:
             Label(self.sideFrame, text=post.text).grid()
         self.sideFrame.grid(row=0, column=1)
 
@@ -191,6 +192,10 @@ class board():
         self.posts.append(post)
         for child in post.children:
             self.addPostToPosts(child)
+
+    def sortPosts(self):
+        self.posts.sort(key=lambda post:post.calcScore())
+
     def savePosts(self):
         writer = csv.writer(open('test.csv', 'wb'))
         self.savePostsHelper(self.posts[0], writer)
@@ -233,6 +238,9 @@ class board():
         print("destroyed stuff, now I make stuff")
         for child in self.sideFrame.winfo_children():
             child.destroy()
+        self.posts = []
+        self.addPostToPosts(self.rootPost)
+        self.sortPosts()
         self.makeMainArea()
         self.makeSecondaryArea()
 
@@ -289,9 +297,9 @@ def printTree(root, indentLevel):
 
 def doBoard():
     newPost = Post(1,"Bob", 'what i said', 2, 7, None)
-    replyPost = Post(2,"Alice", 'what she said', 7, 2, newPost)
+    replyPost = Post(2,"Alice", 'what she said', 100, 2, newPost)
     SisterPost = Post(3,"Carrol",'a thing', 8, 2, newPost)
-    SisterPost = Post(4,"Carrol", 'another thing', 8, 2, replyPost)
+    SisterPost = Post(4,"Carrol", 'another thing', 215, 2, replyPost)
     newBoard = board(newPost)
 
 
